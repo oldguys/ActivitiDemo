@@ -12,14 +12,29 @@ import javax.persistence.Entity;
 @Entity
 public class ProcessAuditStatus extends BaseEntity {
 
+    /**
+     *  流程定义Key
+     */
     private String processDefinitionKey;
 
+    /**
+     *  流程定义ID
+     */
     private String processDefinitionId;
 
+    /**
+     *  节点
+     */
     private String userTask;
 
+    /**
+     *  审核状态码
+     */
     private String auditCode;
 
+    /**
+     *  审核状态描述
+     */
     private String auditMessage;
 
     public String getProcessDefinitionKey() {

@@ -12,16 +12,34 @@ import javax.persistence.Entity;
 @Entity
 public class ProcessTaskConfig extends BaseEntity{
 
+    /**
+     *  流程定义ID
+     */
     private String processDefinitionId;
 
+    /**
+     *  流程定义Key
+     */
     private String processDefinitionKey;
 
+    /**
+     * 流程判定标识
+     */
     private String flowFlag;
 
+    /**
+     *  连线ID
+     */
     private String flowId;
 
+    /**
+     *  显示按钮名称
+     */
     private String btn;
 
+    /**
+     *  相应后台链接
+     */
     private String url;
 
     public String getFlowId() {
