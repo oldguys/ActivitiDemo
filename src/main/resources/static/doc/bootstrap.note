@@ -1,0 +1,9 @@
+/**
+* 全面版
+**/
+container-fluid
+
+<input type="text" id="menuId" class="form-control form-info" name="jobNumber" autocomplete="off" readonly>
+autocomplete="off" // 不带出历史数据
+readonly // 只读
+disabled // 不可使用，包括事件都会被禁止

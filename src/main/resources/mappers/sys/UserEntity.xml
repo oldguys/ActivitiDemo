@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oldguy.example.modules.sys.dao.jpas.UserEntityMapper">
+
+    <sql id="table_name">user_entity</sql>
+
+    <sql id="all_entity_columns">
+		${prefix}.username,
+        ${prefix}.user_id,
+        ${prefix}.id,
+        ${prefix}.create_time,
+        ${prefix}.`status`
+	</sql>
+
+
+    <select id="findByPage" resultType="UserEntity">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/> a
+        <where>
+            <if test="form.status != null">
+                AND a.`status` = #{form.status}
+            </if>
+        </where>
+        <choose>
+            <when test="form.sort != null and form.sort == 1">
+                ORDER BY a.id DESC
+            </when>
+            <when test="form.sort != null and form.sort == 0">
+                ORDER BY a.id ASC
+            </when>
+            <otherwise>
+                ORDER BY a.id DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findByUserId" parameterType="string" resultType="UserEntity">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/>
+        a
+        WHERE
+        user_id = #{userId}
+    </select>
+
+    <select id="findByUserIdSet" parameterType="string" resultType="UserEntity">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/>
+        a
+        WHERE
+        user_id
+        <foreach collection="collections" item="item" separator="," open="IN (" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findOne" parameterType="long" resultType="UserEntity">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/>
+        a
+        WHERE
+        id = #{id}
+    </select>
+
+    <select id="findAllByStatus" parameterType="int" resultType="UserEntity">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/> a
+        <where>
+            <choose>
+                <when test="status != null">
+                    `status` = #{status}
+                </when>
+            </choose>
+        </where>
+    </select>
+
+    <update id="update" parameterType="UserEntity">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        user_id = #{userId},
+        username = #{username},
+        create_time = #{createTime},
+        `status` = #{status}
+        WHERE
+        id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        `status` = #{status}
+        WHERE
+        id = #{id}
+    </update>
+
+    <insert id="save" parameterType="UserEntity" keyProperty="id" useGeneratedKeys="true">
+        INSERT
+        <include refid="table_name"/>
+        (
+        username,
+        user_id,
+        create_time,
+        `status`
+        )
+        VALUES (
+        #{username},
+        #{userId},
+        #{createTime},
+        #{status}
+        )
+    </insert>
+
+    <insert id="saveBatch" parameterType="UserEntity" keyProperty="id" useGeneratedKeys="true">
+        INSERT
+        <include refid="table_name"/>
+        (
+        username,
+        user_id,
+        create_time,
+        `status`
+        )
+        VALUES
+        <foreach collection="collections" item="item" separator=",">
+            (
+            #{item.username},
+            #{item.userId},
+            #{item.createTime},
+            #{item.status}
+            )
+        </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ProcessTaskConfig</title>
+    <span th:include="common/templates :: common-css-js"></span>
+    <span th:include="common/templates :: init-menu"></span>
+    <span th:include="common/templates :: bootstrap-table"></span>
+</head>
+<body>
+<div th:replace="common/templates :: header"></div>
+<div class="container">
+
+    <div class="page-header">
+        <div class="h3">ProcessTaskConfig
+        </div>
+    </div>
+    <table id="records-info"></table>
+</div>
+</body>
+<script th:inline="text">
+
+    $('#records-info').bootstrapTable({
+        url: "[[@{/ProcessTaskConfig/all}]]",//请求数据url
+        showRefresh: true,
+        smartDisplay: true,
+        showToggle: true,
+        paginationPreText: '上一页',
+        paginationNextText: '下一页',
+        pagination: true,//分页
+        pageNumber: 1,
+        pageSize: 15,
+        pageList: [10, 20, 30, 50, 'all'],//分页步进值
+        search: true, //显示搜索框
+        columns: [
+            {
+                field: 'id',
+                title: '编号',
+            },
+            {
+                field: 'processDefinitionId',
+                title: '流程ID',
+            },
+            {
+                field: 'processDefinitionKey',
+                title: '流程定义',
+            },
+            {
+                field: 'flowFlag',
+                title: '标示',
+            },
+            {
+                field: 'flowId',
+                title: '连线ID',
+            },
+            {
+                field: 'btn',
+                title: '按钮',
+            },            {
+
+                field: 'url',
+                title: 'URL',
+            },
+            {
+                field: 'id',
+                title: '编辑',
+                formatter: function (value, row, index) { // 单元格格式化函数
+                    return "<a target='_blank' class='btn btn-default' href='[[@{/Process/processDefinitionImage}]]?processDefinitionId=" + value + "'><i class='glyphicon glyphicon-leaf'></i></a>"
+                }
+            },
+        ]
+    })
+</script>
+</html>

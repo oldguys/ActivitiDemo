@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>任务详情</title>
+    <span th:include="common/templates :: common-css-js"></span>
+    <span th:include="common/templates :: init-menu"></span>
+    <span th:include="common/templates :: bootstrap-table"></span>
+</head>
+<body>
+<div th:replace="common/templates :: header"></div>
+<div class="container">
+
+    <div class="page-header">
+        <div class="h3">Entity1Process step2</div>
+    </div>
+    <div class="row">
+        <div class="col-md-7">
+            <label>任务详情:</label>
+            <hr>
+            <table class="table table-bordered">
+                <tr>
+                    <td>ID:</td>
+                    <td id="id"></td>
+                    <td>任务名称:</td>
+                    <td id="taskName"></td>
+                </tr>
+                <tr>
+                    <td>任务执行人</td>
+                    <td colspan="3" id="assignerNames"></td>
+                </tr>
+                <tr>
+                    <td>创建时间:</td>
+                    <td id="createTime"></td>
+                    <td>历时:</td>
+                    <td id="duration"></td>
+                </tr>
+            </table>
+            <label>业务表单:</label>
+            <hr>
+            <table class="table table-bordered">
+                <tr>
+                    <td>ID:</td>
+                    <td id="data-id"></td>
+                    <td>名称:</td>
+                    <td>测试流程1</td>
+                </tr>
+                <tr>
+                    <td>创建时间:</td>
+                    <td id="data-createTime"></td>
+                    <td>创建人:</td>
+                    <td id="data-creatorName"></td>
+                </tr>
+                <tr>
+                    <td>确认时间:</td>
+                    <td id="data-confirmDate"></td>
+                    <td>确认人:</td>
+                    <td id="data-confirmUsername"></td>
+                </tr>
+                <tr>
+                    <td>备注</td>
+                    <td colspan="3" id="data-remark"></td>
+                </tr>
+            </table>
+            <br>
+            <div>
+                <hr>
+                <label>批注:</label>
+                <textarea id="comment-panel" class="form-control"></textarea>
+            </div>
+            <br>
+            <div id="btn-panel" class="text-center">
+            </div>
+            <br><br><br><br><br><br><br><br>
+        </div>
+        <div class="col-md-5">
+            <img id="data-flow-image"/>
+        </div>
+
+    </div>
+</div>
+</body>
+<script th:inline="text">
+
+    // 获取任务详情
+    var url = document.location;
+    var href = url['href'];
+    var id = href.substr(href.lastIndexOf("/") + 1);
+    console.log(id);
+
+    $.get("[[@{/Task/current/}]]" + id, function (result) {
+        console.log(result);
+        if (null != result) {
+            var taskEntityInfo = result['taskEntityInfo'];
+            $("#id").text(taskEntityInfo['id']);
+            $("#taskName").text(taskEntityInfo['taskName']);
+            $("#createTime").text(taskEntityInfo['createTime']);
+            $("#duration").text(taskEntityInfo['duration']);
+
+            var assignerNames = taskEntityInfo['assignerNames'];
+            var str = "";
+            for (var i = 0; i < assignerNames.length; i++) {
+
+                str += assignerNames[i];
+                if (i < assignerNames.length - 1) {
+                    str += " , ";
+                }
+            }
+            $("#assignerNames").text(str);
+
+            // 设置图片
+            $("#data-flow-image").attr("src", "[[@{/Task/ProcessInstanceImage/}]]" + taskEntityInfo['id']);
+
+            // 设置业务详情
+            var target = result['target'];
+            $("#data-id").text(target['id']);
+            $("#data-createTime").text(target['createTime']);
+            $("#data-creatorName").text(target['creatorName']);
+            $("#data-confirmDate").text(target['confirmDate']);
+            $("#data-confirmUsername").text(target['confirmUsername']);
+            $("#data-remark").text(target['remark']);
+
+            // 初始化按钮
+            initBtn(result['workBtnList'], taskEntityInfo['id']);
+        }
+    })
+
+    $("#btn-panel").on("click", ".btn-commit", function () {
+        var href = $(this).attr("data-href");
+        var id = $(this).attr("data-id");
+        var flowFlag = $(this).attr("data-flowFlag");
+        var comment = $("#comment-panel").val();
+
+        $(this).addClass("disabled");
+
+        $.post(href, {taskId: id, comment: comment, flowFlag: flowFlag}, function (result) {
+            if (result['code'] == 200) {
+                location.href = "[[@{/view/WorkFlow/current}]]";
+            }
+        })
+
+    })
+
+    function initBtn(workBtnList, taskId) {
+
+        var str = "";
+        for (var i = 0; i < workBtnList.length; i++) {
+            var node = workBtnList[i];
+            if (node['flowFlag'] == 'default-submit') {
+                str += "<a class='btn btn-success btn-commit' data-id='" + taskId + "' data-href='" + node['url'] + "' data-flowFlag='" + node['flowFlag'] + "'>" + node['name'] + "</a>&nbsp;";
+            }
+        }
+
+        // 配置按钮
+        $("#btn-panel").html(str);
+    }
+
+</script>
+</html>

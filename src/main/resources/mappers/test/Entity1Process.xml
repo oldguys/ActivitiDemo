@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oldguy.example.modules.test.dao.jpas.Entity1ProcessMapper">
+
+    <sql id="table_name">entity_1_process</sql>
+
+    <sql id="all_entity_columns">
+		${prefix}.audit_status,
+        ${prefix}.creator_id,
+        ${prefix}.creator_name,
+        ${prefix}.confirm_user_id,
+        ${prefix}.confirm_username,
+        ${prefix}.confirm_date,
+        ${prefix}.remark,
+        ${prefix}.id,
+        ${prefix}.create_time,
+        ${prefix}.`status`
+	</sql>
+
+
+    <select id="findByPage" resultType="Entity1Process">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/> a
+        <where>
+            <if test="form.status != null">
+                AND a.`status` = #{form.status}
+            </if>
+        </where>
+        <choose>
+            <when test="form.sort != null and form.sort == 1">
+                ORDER BY a.id DESC
+            </when>
+            <when test="form.sort != null and form.sort == 0">
+                ORDER BY a.id ASC
+            </when>
+            <otherwise>
+                ORDER BY a.id DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="findOne" parameterType="long" resultType="Entity1Process">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/>
+        a
+        WHERE
+        id = #{id}
+    </select>
+
+    <select id="findAllByStatus" parameterType="int" resultType="Entity1Process">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/> a
+        <where>
+            <choose>
+                <when test="status != null">
+                    `status` = #{status}
+                </when>
+            </choose>
+        </where>
+    </select>
+
+    <update id="update" parameterType="Entity1Process">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        audit_status  = #{auditStatus},
+        creator_id  = #{creatorId},
+        creator_name  = #{creatorName},
+        confirm_user_id  = #{confirmUserId},
+        confirm_username = #{confirmUsername},
+        confirm_date = #{confirmDate},
+        remark = #{remark},
+        create_time = #{createTime},
+        `status` = #{status}
+        WHERE
+        id = #{id}
+    </update>
+
+    <update id="updateAuditStatus">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        audit_status = #{auditStatus}
+        WHERE
+        id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        `status` = #{status}
+        WHERE
+        id = #{id}
+    </update>
+
+    <insert id="save" parameterType="Entity1Process" keyProperty="id" useGeneratedKeys="true">
+        INSERT
+        <include refid="table_name"/>
+        (
+        audit_status,
+        creator_id,
+        creator_name,
+        confirm_user_id,
+        confirm_username,
+        confirm_date,
+        remark,
+        create_time,
+        `status`
+        )
+        VALUES (
+        #{auditStatus},
+        #{creatorId},
+        #{creatorName},
+        #{confirmUserId},
+        #{confirmUsername},
+        #{confirmDate},
+        #{remark},
+        #{createTime},
+        #{status}
+        )
+    </insert>
+
+    <insert id="saveBatch" parameterType="Entity1Process" keyProperty="id" useGeneratedKeys="true">
+        INSERT
+        <include refid="table_name"/>
+        (
+        audit_status,
+        creator_id,
+        creator_name,
+        confirm_user_id,
+        confirm_username,
+        confirm_date,
+        remark,
+        create_time,
+        `status`
+        )
+        VALUES
+        <foreach collection="collections" item="item" separator=",">
+            (
+            #{item.auditStatus},
+            #{item.creatorId},
+            #{item.creatorName},
+            #{item.confirmUserId},
+            #{item.confirmUsername},
+            #{item.confirmDate},
+            #{item.remark},
+            #{item.createTime},
+            #{item.status}
+            )
+        </foreach>
+    </insert>
+</mapper>

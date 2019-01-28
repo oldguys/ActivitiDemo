@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oldguy.example.modules.workflow.dao.jpas.ProcessTaskConfigMapper">
+
+    <sql id="table_name">process_task_config</sql>
+
+    <sql id="all_entity_columns">
+		${prefix}.process_definition_id,
+        ${prefix}.process_definition_key,
+        ${prefix}.flow_flag,
+        ${prefix}.flow_id,
+        ${prefix}.btn,
+        ${prefix}.url,
+        ${prefix}.create_time,
+        ${prefix}.id,
+        ${prefix}.`status`
+	</sql>
+
+
+    <select id="findByPage" resultType="ProcessTaskConfig">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/>
+        a
+        <where>
+            <if test="form.status != null">
+                AND a.`status` = #{form.status}
+            </if>
+        </where>
+        <choose>
+            <when test="form.sort != null and form.sort == 1">
+                ORDER BY a.id DESC
+            </when>
+            <when test="form.sort != null and form.sort == 0">
+                ORDER BY a.id ASC
+            </when>
+            <otherwise>
+                ORDER BY a.id DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findOne" parameterType="long" resultType="ProcessTaskConfig">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/>
+        a
+        WHERE
+        id = #{id}
+    </select>
+
+    <select id="findByProcessDefinitionId" parameterType="string" resultType="ProcessTaskConfig">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/>
+        a
+        WHERE
+        process_definition_id = #{processDefinitionId}
+    </select>
+
+    <select id="findByProcessDefinitionKey" parameterType="string" resultType="ProcessTaskConfig">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/>
+        a
+        WHERE
+        process_definition_id = (SELECT process_definition_id FROM process_task_config WHERE process_definition_key = #{processDefinitionKey} ORDER BY create_time DESC LIMIT 1)
+    </select>
+
+    <select id="findAllByStatus" parameterType="int" resultType="ProcessTaskConfig">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/>
+        a
+        <where>
+            <choose>
+                <when test="status != null">
+                    `status` = #{status}
+                </when>
+            </choose>
+        </where>
+    </select>
+
+    <update id="update" parameterType="ProcessTaskConfig">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        process_definition_id = #{processDefinitionId},
+        process_definition_key = #{processDefinitionKey},
+        flow_flag = #{flowFlag},
+        flow_id = #{flowId},
+        btn = #{btn},
+        url = #{url},
+        create_time = #{createTime},
+        `status` = #{status}
+        WHERE
+        id = #{id}
+    </update>
+
+    <update id="updateBatch" parameterType="ProcessTaskConfig">
+        <foreach collection="collection" item="item" separator=";">
+            UPDATE
+            <include refid="table_name"/>
+            SET
+            process_definition_id = #{item.processDefinitionId},
+            process_definition_key = #{item.processDefinitionKey},
+            flow_flag = #{item.flowFlag},
+            flow_id = #{item.flowId},
+            btn = #{item.btn},
+            url = #{item.url},
+            create_time = #{item.createTime},
+            `status` = #{item.status}
+            WHERE
+            id = #{item.id}
+        </foreach>
+    </update>
+
+    <update id="updateStatus">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        `status` = #{status}
+        WHERE
+        id = #{id}
+    </update>
+
+    <insert id="save" parameterType="ProcessTaskConfig" keyProperty="id" useGeneratedKeys="true">
+        INSERT
+        <include refid="table_name"/>
+        (
+        process_definition_id,
+        process_definition_key,
+        flow_flag,
+        flow_id,
+        btn,
+        url,
+        create_time,
+        `status`
+        )
+        VALUES (
+        #{processDefinitionId},
+        #{processDefinitionKey},
+        #{flowFlag},
+        #{flowId},
+        #{btn},
+        #{url},
+        #{createTime},
+        #{status}
+        )
+    </insert>
+
+    <insert id="saveBatch" parameterType="ProcessTaskConfig" keyProperty="id" useGeneratedKeys="true">
+        INSERT
+        <include refid="table_name"/>
+        (
+        process_definition_id,
+        process_definition_key,
+        flow_flag,
+        flow_id,
+        btn,
+        url,
+        create_time,
+        `status`
+        )
+        VALUES
+        <foreach collection="collections" item="item" separator=",">
+            (
+            #{item.processDefinitionId},
+            #{item.processDefinitionKey},
+            #{item.flowFlag},
+            #{item.flowId},
+            #{item.btn},
+            #{item.url},
+            #{item.createTime},
+            #{item.status}
+            )
+        </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Process Definition Config</title>
+    <span th:include="common/templates :: common-css-js"></span>
+    <span th:include="common/templates :: init-menu"></span>
+    <span th:include="common/templates :: bootstrap-table"></span>
+</head>
+<body>
+<div th:replace="common/templates :: header"></div>
+<div class="container">
+
+    <div class="page-header">
+        <div class="h3">Process Definition Config
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <img id="flow-image">
+        </div>
+        <div class="col-md-8">
+            <div>
+                <label>流程定义:</label>
+                <hr>
+            </div>
+            <table class="table table-bordered">
+                <thead>
+                <td>编号</td>
+                <td>流程Key</td>
+                <td>流程名称</td>
+                <td>部署ID</td>
+                <td>版本</td>
+                </thead>
+                <tbody id="process-definition-info">
+                </tbody>
+            </table>
+
+            <div>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab"
+                                                              data-toggle="tab">审核状态</a></li>
+                    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab"
+                                               data-toggle="tab">任务配置</a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="home">
+                        <br>
+                        <br>
+                        <div>
+                            <label>审核状态:</label>
+                            <hr>
+                        </div>
+                        <table class="table table-bordered">
+                            <thead>
+                            <td>ID</td>
+                            <td>节点名称</td>
+                            <td>审核状态</td>
+                            <td>审核描述</td>
+                            </thead>
+                            <tbody id="process-audit-info">
+                            </tbody>
+                        </table>
+                        <a class="btn btn-warning pull-right" id="btn-update">更新-审核状态</a>
+
+                    </div>
+                    <div class="tab-pane" id="profile">
+                        <br><br>
+                        <div>
+                            <label>任务配置:</label>
+                            <hr>
+                        </div>
+                        <table class="table table-bordered">
+                            <thead>
+                            <td>起始</td>
+                            <td>连线</td>
+                            <td>指向</td>
+                            <td>条件</td>
+                            <td>节点标识</td>
+                            <td>按钮</td>
+                            <td>URL</td>
+                            </thead>
+                            <tbody id="process-task-info">
+                            </tbody>
+                        </table>
+                        <a class="btn btn-warning pull-right" id="btn-task-update">更新-节点信息</a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <br><br><br><br>
+</div>
+</body>
+
+<div class="modal fade" tabindex="-1" id="modal-info" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true" id="modal-info-close2">&times;</span></button>
+                <h4 class="modal-title">消息</h4>
+            </div>
+            <div class="modal-body" id="modal-info-body">
+                <p>One fine body&hellip;</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="modal-info-close1">确定</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script th:inline="text">
+
+    // 获取任务详情
+    var url = document.location;
+    var href = url['href'];
+    var id = href.substr(href.lastIndexOf("/") + 1);
+    // 设置图片
+    var dataHref = "[[@{/Process/processDefinitionImage}]]?processDefinitionId=" + id;
+    $("#flow-image").attr("src", dataHref);
+
+    var processDefinitionKey;
+
+    $.get("[[@{/Process/processDefinitions/info}]]?processDefinitionId=" + id, function (result) {
+
+        var str = "<tr><td>" + result['id'] + "</td>" +
+            "<td>" + result['key'] + "</td>" +
+            "<td>" + result['name'] + "</td>" +
+            "<td>" + result['deploymentId'] + "</td>" +
+            "<td>" + result['version'] + "</td></tr>";
+        $("#process-definition-info").append(str);
+
+        processDefinitionKey = result['key'];
+        //初始化流程审核状态
+        initAuditItem(result['elements'], result['elementValueMap']);
+        //初始化任务连线
+        initTaskFLowItem(result['taskFlowList']);
+    });
+
+    /**
+     *
+     *
+     **/
+    function initTaskFLowItem(elements) {
+
+        var str = "";
+
+        for (var i = 0; i < elements.length; i++) {
+            var element = elements[i];
+
+            var name = element['name'];
+            name = name == null ? "默认提交" : name;
+
+            var expression = element['expression'];
+            expression = expression == null ? "" : expression;
+
+            var flowFlag = '';
+            var btn = '';
+            var url = '';
+
+            str += "<tr data-id='" + element['id'] + "'>" +
+                "<td width='10%'>" + element['sourceTask'] + "</td>" +
+                "<td class='text-danger'>" + name + "</td>" +
+                "<td width='10%'>" + element['targetTask'] + "</td>" +
+                "<td width='10%'>" + expression + "</td>" +
+                "<td width='15%'><input class='form-control' type='text' name='flowFlag' value='" + flowFlag + "' placeholder='标识'></td>" +
+                "<td width='15%'><input class='form-control' type='text' name='btn' value='" + btn + "' placeholder='按钮'></td>" +
+                "<td width='30%'><input class='form-control' type='text' name='url' value='" + url + "'  placeholder='URL'></td></tr>";
+        }
+
+        $("#process-task-info").append(str);
+    }
+
+    /**
+     *  配置流程审核状态
+     * @param elements
+     * @param elementValueMap
+     */
+    function initAuditItem(elements, elementValueMap) {
+
+        var str = "";
+
+        for (var i = 0; i < elements.length; i++) {
+            var element = elements[i];
+
+            var auditCode = "";
+            var auditMessage = "";
+
+            var valueNode = elementValueMap[element['id']];
+            if (valueNode != null && valueNode != undefined) {
+                auditCode = valueNode['auditCode'];
+                auditMessage = valueNode['auditMessage'];
+            }
+
+
+            str += "<tr data-id='" + element['id'] + "'>" +
+                "<td>" + element['id'] + "</td>" +
+                "<td>" + element['name'] + "</td>" +
+                "<td><input class='form-control' type='text' name='code' value='" + auditCode + "' placeholder='审核状态'></td>" +
+                "<td><input class='form-control' type='text' name='message' value='" + auditMessage + "'  placeholder='审核描述'></td></tr>";
+        }
+
+        $("#process-audit-info").append(str);
+    }
+
+    /**
+     *  更新审批状态
+     */
+    $("#btn-update").click(function () {
+
+        var records = [];
+        var trList = $("#process-audit-info").find("tr");
+        for (var i = 0; i < trList.length; i++) {
+
+            var item = $(trList[i]);
+            var itemId = item.attr("data-id");
+
+            var codeInput = $(item.find("input[name=code]")[0]);
+            var messageInput = $(item.find("input[name=message]")[0]);
+
+            records[i] = {
+                itemId: itemId,
+                code: codeInput.val(),
+                message: messageInput.val()
+            }
+        }
+
+        var params = {
+            processDefinitionKey: processDefinitionKey,
+            processDefinitionId: id,
+            elements: records
+        }
+        console.log(params);
+        var json = JSON.stringify(params);
+        console.log(json);
+
+        $(this).addClass("disabled")
+
+        $.ajax({
+            type: 'POST',
+            url: "[[@{/ProcessAuditStatus/persist}]]",
+            contentType: "application/json;charset=utf-8",
+            data: json,
+            dataType: "json",
+            success: function (result) {
+                console.log(result);
+
+                $("#btn-update").removeClass("disabled");
+
+                if (result['code'] == 200) {
+                    $("#modal-info").modal("show");
+                    $("#modal-info-body").html("<p class='text-success'>更新成功!</p>");
+                }
+
+            },
+            error: function (result) {
+                $("#btn-update").removeClass("disabled");
+                $("#modal-info").modal("show");
+                if (result['responseJSON']['code'] == 400) {
+                    $("#modal-info-body").html("<p class='text-danger'>" + result['responseJSON']['message'] + "</p>");
+                } else {
+                    $("#modal-info-body").html("<p class='text-danger'>系统异常，请联系!</p>");
+                }
+            }
+        });
+
+    })
+
+    /**
+     *  更新节点配置
+     */
+    $("#btn-task-update").click(function () {
+
+        var records = [];
+        var trList = $("#process-task-info").find("tr");
+        for (var i = 0; i < trList.length; i++) {
+
+            var item = $(trList[i]);
+            var itemId = item.attr("data-id");
+
+            var btnInput = $(item.find("input[name=btn]")[0]);
+            var urlInput = $(item.find("input[name=url]")[0]);
+            var flowFlagInput = $(item.find("input[name=flowFlag]")[0]);
+
+            records[i] = {
+                flowId: itemId,
+                btn: btnInput.val(),
+                url: urlInput.val(),
+                flowFlag: flowFlagInput.val()
+            }
+        }
+
+        var params = {
+            processDefinitionKey: processDefinitionKey,
+            processDefinitionId: id,
+            elements: records
+        }
+        console.log(params);
+        var json = JSON.stringify(params);
+        console.log(json);
+
+        $(this).addClass("disabled")
+
+        $.ajax({
+            type: 'POST',
+            url: "[[@{/ProcessTaskConfig/persist}]]",
+            contentType: "application/json;charset=utf-8",
+            data: json,
+            dataType: "json",
+            success: function (result) {
+                console.log(result);
+
+                $("#btn-task-update").removeClass("disabled");
+
+                if (result['code'] == 200) {
+                    $("#modal-info").modal("show");
+                    $("#modal-info-body").html("<p class='text-success'>更新成功!</p>");
+                }
+
+            },
+            error: function (result) {
+                $("#btn-task-update").removeClass("disabled");
+                $("#modal-info").modal("show");
+                if (result['responseJSON']['code'] == 400) {
+                    $("#modal-info-body").html("<p class='text-danger'>" + result['responseJSON']['message'] + "</p>");
+                } else {
+                    $("#modal-info-body").html("<p class='text-danger'>系统异常，请联系!</p>");
+                }
+            }
+        });
+
+    })
+
+    $("#modal-info-close2,#modal-info-close1").click(function () {
+        $("#modal-info").modal("hide");
+    })
+</script>
+</html>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oldguy.example.modules.workflow.dao.jpas.UserProcessInstanceMapper">
+
+    <select id="findOne" parameterType="string" resultType="UserProcessInstance">
+        SELECT
+        a.ID_ id
+        ,a.BUSINESS_KEY_ businessKey
+        ,a.START_USER_ID_ creatorId
+        ,a.START_TIME_ startTime
+        ,a.END_TIME_ endTime
+        ,b.NAME_ taskName
+        ,b.ASSIGNEE_ assignee
+        ,d.creator_id
+        ,d.creator_name
+        ,g.NAME_ processName
+        ,f.candidate_user
+        ,g.KEY_ processDefinitionKey
+        FROM
+        ACT_HI_PROCINST a
+        LEFT JOIN ACT_HI_TASKINST b ON a.PROC_INST_ID_ = b.PROC_INST_ID_
+        LEFT JOIN history_task d ON d.business_key = a.BUSINESS_KEY_
+        LEFT JOIN (
+        SELECT e.TASK_ID_,GROUP_CONCAT(e.USER_ID_) candidate_user FROM ACT_HI_IDENTITYLINK e WHERE e.TYPE_ = 'candidate' GROUP BY e.TASK_ID_
+        ) f ON f.TASK_ID_ = b.ID_
+        LEFT JOIN ACT_RE_PROCDEF g ON a.PROC_DEF_ID_ = g.ID_
+        WHERE
+        b.START_TIME_ = (SELECT MAX(c.START_TIME_) FROM ACT_HI_TASKINST c  WHERE b.PROC_INST_ID_ = c.PROC_INST_ID_)
+        AND a.ID_ = #{processInstanceId}
+    </select>
+
+
+    <select id="findByPage" parameterType="long" resultType="UserProcessInstance">
+        SELECT
+        a.ID_ id
+        ,a.BUSINESS_KEY_ businessKey
+        ,a.START_USER_ID_ creatorId
+        ,a.START_TIME_ startTime
+        ,a.END_TIME_ endTime
+        ,b.NAME_ taskName
+        ,b.ASSIGNEE_ assignee
+        ,d.creator_id
+        ,d.creator_name
+        ,g.NAME_ processName
+        ,f.candidate_user
+        ,g.KEY_ processDefinitionKey
+        FROM
+        ACT_HI_PROCINST a
+        LEFT JOIN ACT_HI_TASKINST b ON a.PROC_INST_ID_ = b.PROC_INST_ID_
+        LEFT JOIN history_task d ON d.business_key = a.BUSINESS_KEY_
+        LEFT JOIN (
+        SELECT e.TASK_ID_,GROUP_CONCAT(e.USER_ID_) candidate_user FROM ACT_HI_IDENTITYLINK e WHERE e.TYPE_ = 'candidate' GROUP BY e.TASK_ID_
+        ) f ON f.TASK_ID_ = b.ID_
+        LEFT JOIN ACT_RE_PROCDEF g ON a.PROC_DEF_ID_ = g.ID_
+        WHERE
+        b.START_TIME_ = (SELECT MAX(c.START_TIME_) FROM ACT_HI_TASKINST c  WHERE b.PROC_INST_ID_ = c.PROC_INST_ID_)
+        <if test="form.userId != null and !&quot;&quot;.equals(form.userId.toString().trim())">
+          AND a.START_USER_ID_ = #{form.userId}
+        </if>
+        <if test="form.queryText != null and !&quot;&quot;.equals(form.queryText.toString().trim())">
+            AND (
+            g.NAME_ LIKE CONCAT('%',#{form.queryText},'%')
+            OR d.confirm_username LIKE CONCAT('%',#{form.queryText},'%')
+            OR b.NAME_ LIKE CONCAT('%',#{form.queryText},'%')
+            )
+        </if>
+        ORDER BY a.START_TIME_ DESC
+    </select>
+
+</mapper>

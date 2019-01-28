@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Entity2Process</title>
+    <span th:include="common/templates :: common-css-js"></span>
+    <span th:include="common/templates :: init-menu"></span>
+    <span th:include="common/templates :: bootstrap-table"></span>
+</head>
+<body>
+<div th:replace="common/templates :: header"></div>
+<div class="container">
+
+    <div class="page-header">
+        <div class="h3">Entity2Process
+            <a class="btn btn-default pull-right" id="openProcessInstance">开启流程</a>
+        </div>
+    </div>
+    <table id="records-info"></table>
+</div>
+</body>
+<script th:inline="text">
+
+    $("#openProcessInstance").click(function () {
+        $.post("[[@{/Entity2Process/openProcessInstance}]]",function (result) {
+            if(result['code']==200){
+                $('#records-info').bootstrapTable("refresh");
+            }
+        })
+    })
+
+    $('#records-info').bootstrapTable({
+        url: "[[@{/Entity2Process/all}]]",//请求数据url
+        showRefresh: true,
+        smartDisplay: true,
+        showToggle: true,
+        paginationPreText: '上一页',
+        paginationNextText: '下一页',
+        pagination: true,//分页
+        pageNumber: 1,
+        pageSize: 15,
+        pageList: [10, 20, 30, 50, 'all'],//分页步进值
+        search: true, //显示搜索框
+        columns: [
+            {
+                field: 'id',
+                title: '编号',
+            },
+            {
+                field: 'creatorName',
+                title: '创建人',
+            },
+            {
+                field: 'auditStatus',
+                title: '节点',
+                cellStyle: function (value, row, index, field) {
+                    if (value == 2) {
+                        return {
+                            classes: 'bg-warning',
+//                            css: {"color": "blue", "font-size": "50px"}
+                        };
+                    }
+                    if (value == 3) {
+                        return {
+                            classes: 'bg-success',
+//                            css: {"color": "blue", "font-size": "50px"}
+                        };
+                    }
+                    return {classes: 'bg-danger',};
+                },
+                formatter: function (value, row, index) { // 单元格格式化函数
+                    if (value == 2) {
+                        return "步骤2"
+                    }
+                    if (value == 3) {
+                        return "已完成"
+                    }
+                    return "禁用"
+                }
+            },
+            {
+                field: 'confirmUsername',
+                title: '确认用户名',
+            },
+            {
+                field: 'confirmDate',
+                title: '确认时间',
+            },
+            {
+                field: 'remark',
+                title: '备注',
+            },
+            {
+                field: 'createTime',
+                title: '时间',
+            },
+        ]
+    })
+</script>
+</html>

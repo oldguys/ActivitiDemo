@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oldguy.example.modules.workflow.dao.jpas.HistoryTaskMapper">
+
+    <sql id="table_name">history_task</sql>
+
+    <sql id="all_entity_columns">
+		${prefix}.task_id,
+        ${prefix}.task_name,
+        ${prefix}.business_key,
+        ${prefix}.process_instance_id,
+        ${prefix}.process_define_id,
+        ${prefix}.process_define_key,
+        ${prefix}.`comment`,
+        ${prefix}.flow_flag,
+        ${prefix}.creator_id,
+        ${prefix}.creator_name,
+        ${prefix}.create_time,
+        ${prefix}.id,
+        ${prefix}.`status`
+	</sql>
+
+
+    <select id="findByPage" resultType="HistoryTask">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/> a
+        <where>
+            <if test="form.status != null">
+                AND a.`status` = #{form.status}
+            </if>
+        </where>
+        <choose>
+            <when test="form.sort != null and form.sort == 1">
+                ORDER BY a.id DESC
+            </when>
+            <when test="form.sort != null and form.sort == 0">
+                ORDER BY a.id ASC
+            </when>
+            <otherwise>
+                ORDER BY a.id DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findByUserId" parameterType="string" resultType="com.oldguy.example.modules.workflow.dto.HistoryTaskInfo">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        , NAME_ processDefineName
+        FROM
+        <include refid="table_name"/> a
+        LEFT JOIN act_re_procdef b ON a.process_define_id = b.ID_
+        WHERE
+        creator_id = #{userId}
+    </select>
+
+    <select id="findByUserIdSet" parameterType="string" resultType="HistoryTask">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/>
+        a
+        WHERE
+        user_id
+        <foreach collection="collections" item="item" separator="," open="IN (" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findOne" parameterType="long" resultType="HistoryTask">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/>
+        a
+        WHERE
+        id = #{id}
+    </select>
+
+    <select id="findAllByStatus" parameterType="int" resultType="HistoryTask">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/> a
+        <where>
+            <choose>
+                <when test="status != null">
+                    `status` = #{status}
+                </when>
+            </choose>
+        </where>
+    </select>
+
+    <update id="update" parameterType="HistoryTask">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        task_id = #{taskId},
+        task_name = #{taskName},
+        business_key = #{businessKey},
+        process_instance_id = #{processInstanceId},
+        process_define_id = #{processDefineId},
+        process_define_key = #{processDefineKey},
+        `comment` = #{comment},
+        flow_flag = #{flowFlag},
+        creator_id = #{creatorId},
+        creator_name = #{creatorName},
+        create_time = #{createTime},
+        `status` = #{status}
+        WHERE
+        id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        `status` = #{status}
+        WHERE
+        id = #{id}
+    </update>
+
+    <insert id="save" parameterType="HistoryTask" keyProperty="id" useGeneratedKeys="true">
+        INSERT
+        <include refid="table_name"/>
+        (
+        task_id,
+        task_name,
+        business_key,
+        process_instance_id,
+        process_define_id,
+        process_define_key,
+        `comment`,
+        flow_flag,
+        creator_id,
+        creator_name,
+        create_time,
+        `status`
+        )
+        VALUES (
+        #{taskId},
+        #{taskName},
+        #{businessKey},
+        #{processInstanceId},
+        #{processDefineId},
+        #{processDefineKey},
+        #{comment},
+        #{flowFlag},
+        #{creatorId},
+        #{creatorName},
+        #{createTime},
+        #{status}
+        )
+    </insert>
+
+    <insert id="saveBatch" parameterType="HistoryTask" keyProperty="id" useGeneratedKeys="true">
+        INSERT
+        <include refid="table_name"/>
+        (
+        task_id,
+        task_name,
+        business_key,
+        process_instance_id,
+        process_define_id,
+        process_define_key,
+        `comment`,
+        flow_flag,
+        creator_id,
+        creator_name,
+        create_time,
+        `status`
+        )
+        VALUES
+        <foreach collection="collections" item="item" separator=",">
+            (
+            #{item.taskId},
+            #{item.taskName},
+            #{item.businessKey},
+            #{item.processInstanceId},
+            #{item.processDefineId},
+            #{item.processDefineKey},
+            #{item.comment},
+            #{item.flowFlag},
+            #{item.creatorId},
+            #{item.creatorName},
+            #{item.createTime},
+            #{item.status}
+            )
+        </foreach>
+    </insert>
+</mapper>

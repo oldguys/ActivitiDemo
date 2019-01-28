@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Process Definition</title>
+    <span th:include="common/templates :: common-css-js"></span>
+    <span th:include="common/templates :: init-menu"></span>
+    <span th:include="common/templates :: bootstrap-table"></span>
+</head>
+<body>
+<div th:replace="common/templates :: header"></div>
+<div class="container">
+
+    <div class="page-header">
+        <div class="h3">Process Definition
+        </div>
+    </div>
+    <table id="records-info"></table>
+</div>
+</body>
+<script th:inline="text">
+
+    $('#records-info').bootstrapTable({
+        url: "[[@{/Process/processDefinitions/list}]]",//请求数据url
+        showRefresh: true,
+        smartDisplay: true,
+        showToggle: true,
+        paginationPreText: '上一页',
+        paginationNextText: '下一页',
+        pagination: true,//分页
+        pageNumber: 1,
+        pageSize: 15,
+        pageList: [10, 20, 30, 50, 'all'],//分页步进值
+        search: true, //显示搜索框
+        columns: [
+            {
+                field: 'id',
+                title: '编号',
+            },
+            {
+                field: 'key',
+                title: '流程Key',
+            },
+            {
+                field: 'name',
+                title: '流程名称',
+            },
+            {
+                field: 'deploymentId',
+                title: '部署ID',
+            },
+            {
+                field: 'version',
+                title: '版本',
+            },
+            {
+                field: 'id',
+                title: '编辑',
+                formatter: function (value, row, index) { // 单元格格式化函数
+                    return "<a target='_blank' class='btn btn-default' href='[[@{/view/WorkFlow/ProcessDefinitionConfig/}]]" + value + "'><i class='glyphicon glyphicon-leaf'></i></a>"
+                }
+            },
+        ]
+    })
+</script>
+</html>

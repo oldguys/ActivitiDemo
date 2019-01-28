@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oldguy.example.modules.sys.dao.jpas.UserGroupMapper">
+
+    <sql id="table_name">user_group</sql>
+
+    <sql id="all_entity_columns">
+		${prefix}.id,
+		${prefix}.group_name,
+        ${prefix}.group_sequence,
+        ${prefix}.create_time,
+        ${prefix}.`status`
+	</sql>
+
+
+    <select id="findByPage" resultType="UserGroup">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/> a
+        <where>
+            <if test="form.status != null">
+                AND a.`status` = #{form.status}
+            </if>
+        </where>
+        <choose>
+            <when test="form.sort != null and form.sort == 1">
+                ORDER BY a.id DESC
+            </when>
+            <when test="form.sort != null and form.sort == 0">
+                ORDER BY a.id ASC
+            </when>
+            <otherwise>
+                ORDER BY a.id DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="findOne" parameterType="long" resultType="UserGroup">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/>
+        a
+        WHERE
+        id = #{id}
+    </select>
+
+    <select id="findUserIdByGroupSequence" parameterType="string" resultType="string">
+        SELECT
+        user_id
+        FROM
+        user_and_group
+        a
+        WHERE
+        group_sequence = #{groupSequence}
+    </select>
+
+    <select id="findAllByStatus" parameterType="int" resultType="UserGroup">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/> a
+        <where>
+            <choose>
+                <when test="status != null">
+                    `status` = #{status}
+                </when>
+            </choose>
+        </where>
+    </select>
+
+    <update id="update" parameterType="UserGroup">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        group_name = #{groupName},
+        group_sequence = #{groupSequence},
+        `status` = #{status}
+        WHERE
+        id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE
+        <include refid="table_name"/>
+        SET
+        `status` = #{status}
+        WHERE
+        id = #{id}
+    </update>
+
+    <insert id="save" parameterType="UserGroup" keyProperty="id" useGeneratedKeys="true">
+        INSERT
+        <include refid="table_name"/>
+        (
+        group_name,
+        group_sequence,
+        create_time,
+        `status`
+        )
+        VALUES (
+        #{groupName},
+        #{groupSequence},
+        #{userId},
+        #{createTime},
+        #{status}
+        )
+    </insert>
+
+    <insert id="saveBatch" parameterType="UserGroup" keyProperty="id" useGeneratedKeys="true">
+        INSERT
+        <include refid="table_name"/>
+        (
+        group_name,
+        group_sequence,
+        create_time,
+        `status`
+        )
+        VALUES
+        <foreach collection="collections" item="item" separator=",">
+            (
+            #{item.groupName},
+            #{item.groupSequence},
+            #{item.createTime},
+            #{item.status}
+            )
+        </foreach>
+    </insert>
+</mapper>

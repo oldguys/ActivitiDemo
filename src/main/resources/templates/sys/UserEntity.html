@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>UserEntity</title>
+    <span th:include="common/templates :: common-css-js"></span>
+    <span th:include="common/templates :: init-menu"></span>
+    <span th:include="common/templates :: bootstrap-table"></span>
+</head>
+<body>
+<div th:replace="common/templates :: header"></div>
+<div class="container">
+
+    <div class="page-header">
+        <div class="h3">UserEntity</div>
+    </div>
+    <table id="records-info"></table>
+</div>
+</body>
+<script th:inline="text">
+    $('#records-info').bootstrapTable({
+        url: "[[@{/UserEntity/all}]]",//请求数据url
+        showRefresh: true,
+        smartDisplay: true,
+        showToggle: true,
+        paginationPreText: '上一页',
+        paginationNextText: '下一页',
+        pagination: true,//分页
+        pageNumber: 1,
+        pageSize: 15,
+        pageList: [10, 20, 30, 50, 'all'],//分页步进值
+        search: true, //显示搜索框
+        columns: [
+            {
+                field: 'id',
+                title: '编号',
+            },
+            {
+                field: 'username',
+                title: '用户名',
+            },
+            {
+                field: 'userId',
+                title: '用户ID',
+            },
+            {
+                field: 'createTime',
+                title: '时间',
+            },
+            {
+                field: 'status',
+                title: '状态',
+                formatter: function (value, row, index) { // 单元格格式化函数
+                    if(value == 1){
+                        return "<span class='text-success'>正常</span>"
+                    }
+                    return "<span class='text-danger'>禁用</span>"
+                }
+            },
+        ]
+    })
+</script>
+</html>
