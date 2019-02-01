@@ -57,7 +57,7 @@ public class Entity1ProcessService {
         instance.setCreatorName(UserEntityService.getCurrentUserEntity().getUsername());
 
         entity1ProcessMapper.save(instance);
-        ProcessInstance processInstance = processService.openProcessInstance(Entity1Process.class.getSimpleName(), instance.getId(), UserEntityService.getCurrentUserEntity().getUserId());
+        ProcessInstance processInstance = processService.openProcessInstanceWithFirstCommit(Entity1Process.class.getSimpleName(), instance.getId(), UserEntityService.getCurrentUserEntity().getUserId());
         return processInstance.getId();
     }
 

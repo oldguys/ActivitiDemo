@@ -38,12 +38,16 @@
         },
         columns: [
             {
-                field: 'id',
+                field: 'processInstanceId',
                 title: 'ID',
                 sortable: true
             },
             {
-                field: 'processName',
+                field: 'businessKey',
+                title: '业务Key',
+            },
+            {
+                field: 'processDefinitionName',
                 title: '流程名',
             },
             {
@@ -55,7 +59,7 @@
                 title: '结束时间',
             },
             {
-                field: 'creatorName',
+                field: 'creatorId',
                 title: '创建人',
             },
             {
@@ -63,34 +67,63 @@
                 title: '任务名',
             },
             {
-                field: 'assigneeNameSet',
+                field: 'assignees',
                 title: '任务审核人',
+            },
+            {
+                field: 'active',
+                title: '状态',
                 formatter: function (value, row, index) { // 单元格格式化函数
-
-                    var str = "";
-
-                    for (var i = 0; i < value.length; i++) {
-                        str += value[i];
-                        if (i < value.length - 1) {
-                            str += " ，"
-                        }
+                    if (value == '1') {
+                        return "<span class='text-success'>激活</span>"
                     }
-                    return str;
+                    if (value == '2') {
+                        return "<span class='text-danger'>挂起</span>"
+                    }
+
+                    return "<span class='text-warning'>已完成</span>";
                 }
             },
             {
-                field: 'id',
-                title: '详情',
+                field: '',
+                title: '编辑',
                 formatter: function (value, row, index) { // 单元格格式化函数
 
-                    var processDefinitionKey = row['processDefinitionKey'];
-                    var step = row['taskDefinitionKey'];
-                    var str = "<a class='btn btn-default' target='_blank' href='[[@{/view/WorkFlow/}]]" + processDefinitionKey + "/" + step + "/" + value + "' ><i class='glyphicon glyphicon-file'></i></a>";
+                    var active = row['active'];
+                    var processInstanceId = row['processInstanceId'];
 
-                    return str;
+                    if (active == '2') {
+                        return "<a class='btn btn-default btn-sm btn-active' data-flag='activate' data-id='" + processInstanceId + "'><i class='text-danger glyphicon glyphicon-remove'></i></a>"
+                    }
+                    if (active == '1') {
+                        return "<a class='btn btn-default btn-sm btn-active' data-flag='suspend' data-id='" + processInstanceId + "'><i class='text-success glyphicon glyphicon-ok'></i></a>"
+                    }
+
+                    return "";
                 }
             },
         ]
     })
+
+    $("#records-info").on("click", ".btn-active", function () {
+        var id = $(this).attr("data-id");
+        var flag = $(this).attr("data-flag");
+
+        var currentBtn = $(this);
+        currentBtn.addClass("disabled");
+
+        $.post("[[@{/Process/}]]" + flag + "/" + id, function (result) {
+            if (result['code'] == 200) {
+                currentBtn.removeClass("disabled");
+                $("#records-info").bootstrapTable("refresh");
+                alert("更新成功!");
+                return;
+            }
+            alert("系统异常，请联系管理员!");
+        })
+
+
+    })
+
 </script>
 </html>

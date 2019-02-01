@@ -21,5 +21,4 @@ import java.util.List;
 @Service
 public class Entity1ProcessInstanceService extends AbstractProcessInstanceService<Entity1Process> {
 
-
 }

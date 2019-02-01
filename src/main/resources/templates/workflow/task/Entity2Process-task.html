@@ -62,12 +62,29 @@
                     <td colspan="3" id="data-remark"></td>
                 </tr>
             </table>
+
+            <div>
+                <hr>
+                <label>历史批注:</label>
+                <table class="table table-bordered">
+                    <thead>
+                    <th>任务ID</th>
+                    <th>用户</th>
+                    <th>批注</th>
+                    <th>日期</th>
+                    </thead>
+                    <tbody id="history-comment"></tbody>
+                </table>
+            </div>
+
             <br>
             <div>
                 <hr>
                 <label>批注:</label>
                 <textarea id="comment-panel" class="form-control"></textarea>
             </div>
+
+
             <br>
             <div id="btn-panel" class="text-center">
             </div>
@@ -122,8 +139,30 @@
 
             // 初始化按钮
             initBtn(result['workBtnList'], taskEntityInfo['id']);
+
+            // 初始化批注
+            initHistoryComment(result['taskComments']);
         }
     })
+
+    /**
+     *  初始化历史批注
+     * @param result
+     */
+    function initHistoryComment(result) {
+
+        var str = "";
+        for (var i = 0; i < result.length; i++) {
+            var item = result[i];
+            str += "<tr>"+
+                "<td>" + item['taskId'] + "</td>" +
+                "<td>" + item['userId'] + "</td>" +
+                "<td>" + item['message'] + "</td>" +
+                "<td>" + item['time'] + "</td>"+
+                "</tr>";
+        }
+        $("#history-comment").append(str);
+    }
 
     $("#btn-panel").on("click", ".btn-commit", function () {
         var href = $(this).attr("data-href");

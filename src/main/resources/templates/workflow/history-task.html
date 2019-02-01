@@ -32,9 +32,12 @@
         search: true, //显示搜索框
         columns: [
             {
-                field: 'id',
-                title: 'ID',
-                sortable: true
+                field: 'taskId',
+                title: '任务ID',
+            },
+            {
+                field: 'businessKey',
+                title: '业务Key',
             },
             {
                 field: 'creatorName',
@@ -44,20 +47,42 @@
                 field: 'processDefineName',
                 title: '流程名',
             },
-            {
-                field: 'taskId',
-                title: '任务ID',
-            },
+
             {
                 field: 'taskName',
                 title: '任务名',
             },
-
             {
                 field: 'comment',
                 title: '批注',
             },
+            {
+                field: 'lastCommit',
+                title: '操作',
+                formatter: function (value, row, index) { // 单元格格式化函数
+
+                    var taskId = row['taskId'];
+
+                    if (value != undefined && value != null) {
+                        return "<a class='btn btn-default btn-sm btn-cancel' data-id='" + taskId + "'>撤回</a>"
+                    }
+                    return "";
+                }
+            },
         ]
     })
+
+    $("#records-info").on("click", ".btn-cancel" ,function () {
+        var taskId = $(this).attr("data-id");
+
+        $.post("[[@{/Task/callBack/}]]"+taskId,function (result) {
+            if(result['code']==200){
+                $("#records-info").bootstrapTable("refresh");
+                alert("撤回成功!");
+            }
+        })
+
+    })
+
 </script>
 </html>

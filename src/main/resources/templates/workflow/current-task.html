@@ -37,6 +37,10 @@
                 sortable: true
             },
             {
+                field: 'businessKey',
+                title: '业务Key',
+            },
+            {
                 field: 'processDefinitionName',
                 title: '流程名',
             },
@@ -47,18 +51,18 @@
             {
                 field: 'assignerNames',
                 title: '任务审核人',
-                formatter: function (value, row, index) { // 单元格格式化函数
-
-                    var str = "";
-
-                    for (var i = 0; i < value.length; i++) {
-                        str += value[i];
-                        if (i < value.length - 1) {
-                            str += " ，"
-                        }
-                    }
-                    return str;
-                }
+//                formatter: function (value, row, index) { // 单元格格式化函数
+//
+//                    var str = "";
+//
+//                    for (var i = 0; i < value.length; i++) {
+//                        str += value[i];
+//                        if (i < value.length - 1) {
+//                            str += " ，"
+//                        }
+//                    }
+//                    return str;
+//                }
             },
             {
                 field: 'duration',

@@ -27,7 +27,7 @@ public abstract class AbstractWorkEntityService {
     /**
      * 工作流实体集合
      */
-    protected Map<String, ProcessInstanceService> processInstanceServiceMap = Collections.emptyMap();
+    protected Map<String, AbstractProcessInstanceService> processEntityService = Collections.emptyMap();
 
     /**
      * DAO Mapper
@@ -118,9 +118,9 @@ public abstract class AbstractWorkEntityService {
         }
 
         // 注入ProcessInstanceService
-        if (processInstanceServiceMap.isEmpty()) {
+        if (processEntityService.isEmpty()) {
             String[] workflowNames = SpringContextUtils.getBeanNamesForType(ProcessInstanceService.class);
-            processInstanceServiceMap = new HashMap<>(workflowNames.length);
+            processEntityService = new HashMap<>(workflowNames.length);
 
             for (String name : workflowNames) {
                 AbstractProcessInstanceService workFlow = SpringContextUtils.getBean(name, AbstractProcessInstanceService.class);
@@ -134,7 +134,7 @@ public abstract class AbstractWorkEntityService {
                 workFlow.setProcessTaskConfigService(processTaskConfigService);
                 workFlow.setProcessAuditStatusService(processAuditStatusService);
 
-                processInstanceServiceMap.put(typeClass.getSimpleName(), workFlow);
+                processEntityService.put(typeClass.getSimpleName(), workFlow);
             }
         }
     }
@@ -158,7 +158,7 @@ public abstract class AbstractWorkEntityService {
         List<SequenceFlow> outPutLinks = processService.getOutputLinkList(task.getProcessInstanceId(), task.getTaskDefinitionKey());
 
 
-        ProcessInstanceService processInstanceService = processInstanceServiceMap.get(task.getProcessDefinitionKey());
+        ProcessInstanceService processInstanceService = processEntityService.get(task.getProcessDefinitionKey());
         if (null == processInstanceService) {
             throw new FormValidException("没有找到业务服务类:[ " + task.getProcessDefinitionKey() + " ]");
         }
@@ -186,7 +186,7 @@ public abstract class AbstractWorkEntityService {
         String processDefinitionKey = map.get(WorkFlowConfiguration.PROCESS_DEFINITION_KEY);
         Long id = Long.valueOf(map.get(WorkFlowConfiguration.PROCESS_INSTANCE_ID));
 
-        ProcessInstanceService processInstanceService = processInstanceServiceMap.get(processDefinitionKey);
+        ProcessInstanceService processInstanceService = processEntityService.get(processDefinitionKey);
         if (null != processInstanceService) {
             return processInstanceService.updateAuditStatus(id, auditCode);
         }

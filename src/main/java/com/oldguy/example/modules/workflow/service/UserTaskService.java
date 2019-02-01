@@ -23,7 +23,6 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
-import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +58,56 @@ public class UserTaskService {
 
 
     /**
+     * 撤回上一节点
+     * @param taskId
+     */
+    public void callBack(String taskId) {
+
+        HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+        if (null == task) {
+            throw new FormValidException("无效任务ID[ " + taskId + " ]");
+        }
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+        if (null == processInstance) {
+            throw new FormValidException("该流程已完成!无法回退");
+        }
+
+        // 获取流程定义对象
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(task.getProcessDefinitionId());
+        Process process = bpmnModel.getProcesses().get(0);
+
+        List<Task> taskList = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+
+        FlowNode sourceNode = (FlowNode) process.getFlowElement(task.getTaskDefinitionKey());
+        taskList.forEach(obj -> {
+            FlowNode currentNode = (FlowNode) process.getFlowElement(obj.getTaskDefinitionKey());
+            // 获取原本流程连线
+            List<SequenceFlow> outComingSequenceFlows = currentNode.getOutgoingFlows();
+
+            // 配置反转流程连线
+            SequenceFlow sequenceFlow = new SequenceFlow();
+            sequenceFlow.setTargetFlowElement(sourceNode);
+            sequenceFlow.setSourceFlowElement(currentNode);
+            sequenceFlow.setId("callback-flow");
+
+            List<SequenceFlow> newOutComingSequenceFlows = new ArrayList<>();
+            newOutComingSequenceFlows.add(sequenceFlow);
+            currentNode.setOutgoingFlows(newOutComingSequenceFlows);
+
+            // 配置任务审批人
+            Map<String, Object> variables = new HashMap<>(1);
+            variables.put(WorkFlowConfiguration.DEFAULT_USER_TASK_ASSIGNEE, UserEntityService.getCurrentUserEntity().getUserId());
+            // 完成任务
+            taskService.complete(obj.getId(), variables);
+            // 复原流程
+            currentNode.setOutgoingFlows(outComingSequenceFlows);
+        });
+
+        // 更新流程状态
+        updateAuditStatus(processInstance.getProcessInstanceId());
+    }
+
+    /**
      * 获取流程审核状态
      *
      * @param processInstanceId
@@ -77,7 +126,7 @@ public class UserTaskService {
                 if (null != processAuditStatus) {
                     auditCode = processAuditStatus.getAuditCode();
                 }
-            }else{
+            } else {
                 // 流程未完成
                 List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).orderByTaskCreateTime().desc().list();
                 if (!taskList.isEmpty()) {
@@ -91,7 +140,7 @@ public class UserTaskService {
         }
 
         // 更新业务
-        return commonWorkEntityService.updateAuditStatus(historicProcessInstance.getBusinessKey(),auditCode);
+        return commonWorkEntityService.updateAuditStatus(historicProcessInstance.getBusinessKey(), auditCode);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -269,7 +318,7 @@ public class UserTaskService {
     public List<TaskEntityInfo> currentTaskList(String userId) {
 
         List<TaskEntityInfo> records = new ArrayList<>();
-        List<Task> taskList = taskService.createTaskQuery().taskCandidateOrAssigned(userId).orderByTaskCreateTime().desc().list();
+        List<Task> taskList = taskService.createTaskQuery().taskCandidateOrAssigned(userId).active().orderByTaskCreateTime().desc().list();
 
         if (taskList.isEmpty()) {
             return records;

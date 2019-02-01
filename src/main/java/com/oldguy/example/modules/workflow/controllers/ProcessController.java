@@ -3,6 +3,7 @@ package com.oldguy.example.modules.workflow.controllers;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.oldguy.example.modules.common.dto.BootstrapTablePage;
 import com.oldguy.example.modules.common.exceptions.FormValidException;
+import com.oldguy.example.modules.common.utils.HttpJsonUtils;
 import com.oldguy.example.modules.sys.services.UserEntityService;
 import com.oldguy.example.modules.workflow.dao.entities.UserProcessInstance;
 import com.oldguy.example.modules.workflow.dto.UserProcessInstanceQueryForm;
@@ -11,10 +12,7 @@ import com.oldguy.example.modules.workflow.utils.HttpUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -31,6 +29,28 @@ public class ProcessController {
 
     @Autowired
     private ProcessService processService;
+
+    /**
+     *  激活流程实例
+     * @param processInstanceId
+     * @return
+     */
+    @PostMapping("activate/{processInstanceId}")
+    public Object activateProcess(@PathVariable("processInstanceId") String processInstanceId){
+        processService.activateProcessInstance(processInstanceId);
+        return HttpJsonUtils.OK;
+    }
+
+    /**
+     *  挂起流程实例
+     * @param processInstanceId
+     * @return
+     */
+    @PostMapping("suspend/{processInstanceId}")
+    public Object suspendProcess(@PathVariable("processInstanceId") String processInstanceId){
+        processService.suspendProcessInstance(processInstanceId);
+        return HttpJsonUtils.OK;
+    }
 
     @GetMapping("processDefinitions/info")
     public Object getProcessDefinitionInfo(String processDefinitionId){

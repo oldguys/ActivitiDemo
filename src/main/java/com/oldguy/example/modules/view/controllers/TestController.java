@@ -20,4 +20,9 @@ public class TestController {
     public String Entity2Process() {
         return "test/Entity2Process";
     }
+
+    @RequestMapping("Entity3Process")
+    public String Entity3Process() {
+        return "test/Entity3Process";
+    }
 }

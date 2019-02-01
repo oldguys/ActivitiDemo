@@ -1,6 +1,7 @@
 package com.oldguy.example.modules.workflow.controllers;
 
 import com.oldguy.example.modules.common.exceptions.FormValidException;
+import com.oldguy.example.modules.common.utils.HttpJsonUtils;
 import com.oldguy.example.modules.sys.services.UserEntityService;
 import com.oldguy.example.modules.workflow.service.CommonWorkEntityService;
 import com.oldguy.example.modules.workflow.service.UserTaskService;
@@ -8,10 +9,7 @@ import com.oldguy.example.modules.workflow.utils.HttpUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -30,6 +28,14 @@ public class TaskController {
     private UserTaskService userTaskService;
     @Autowired
     private CommonWorkEntityService commonWorkEntityService;
+
+    @PostMapping("callBack/{taskId}")
+    public Object callBack(@PathVariable("taskId") String taskId){
+
+        userTaskService.callBack(taskId);
+
+        return HttpJsonUtils.OK;
+    }
 
     @GetMapping("ProcessInstanceImage/{taskId}")
     public void currentProcessInstanceImage(@PathVariable("taskId") String taskId, HttpServletResponse response) throws IOException {

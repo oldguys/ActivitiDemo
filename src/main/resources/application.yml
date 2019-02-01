@@ -1,6 +1,4 @@
 spring:
-  profiles:
-    active: 205
   thymeleaf:
     cache: false
     mode: LEGACYHTML5

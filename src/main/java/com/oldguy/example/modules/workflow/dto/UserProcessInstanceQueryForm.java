@@ -19,14 +19,14 @@ public class UserProcessInstanceQueryForm extends AbstractPageQueryForm {
      *  1:当前用户
      *  0:包含所有用户
      */
-    private Integer current = 0;
+    private Integer currentUser = 0;
 
-    public Integer getCurrent() {
-        return current;
+    public Integer getCurrentUser() {
+        return currentUser;
     }
 
-    public void setCurrent(Integer current) {
-        this.current = current;
+    public void setCurrentUser(Integer currentUser) {
+        this.currentUser = currentUser;
     }
 
     public String getUserId() {

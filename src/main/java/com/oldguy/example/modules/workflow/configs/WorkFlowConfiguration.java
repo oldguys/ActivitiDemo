@@ -16,6 +16,8 @@ public class WorkFlowConfiguration {
      */
     public static final String DEFAULT_USER_TASK_ASSIGNEE = "assignee";
 
+    public static final String DEFAULT_USER_TASK_ASSIGNEE_LIST = "assigneeList";
+
     /**
      * businessKey 分割符
      */

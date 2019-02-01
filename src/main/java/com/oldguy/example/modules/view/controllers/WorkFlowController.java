@@ -57,8 +57,8 @@ public class WorkFlowController {
     @RequestMapping("{processDefinitionKey}/{step}/{taskId}")
     public String taskInfo(@PathVariable("processDefinitionKey") String processDefinitionKey,
                            @PathVariable("step") String step) {
-
-        return "workflow/task/" + processDefinitionKey + "-" + step;
+        return "workflow/task/Entity2Process-task";
+//        return "workflow/task/" + processDefinitionKey + "-" + step;
     }
 
     @RequestMapping("Entity2Process/{taskId}")

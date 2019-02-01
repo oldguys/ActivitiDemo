@@ -1,6 +1,7 @@
 package com.oldguy.example.modules.workflow.service;
 
 import com.baomidou.mybatisplus.plugins.Page;
+import com.oldguy.example.modules.common.exceptions.FormValidException;
 import com.oldguy.example.modules.sys.services.UserEntityService;
 import com.oldguy.example.modules.workflow.configs.WorkFlowConfiguration;
 import com.oldguy.example.modules.workflow.dao.entities.UserProcessInstance;
@@ -49,6 +50,30 @@ public class ProcessService {
     @Autowired
     private ProcessTaskConfigService processTaskConfigService;
 
+    /**
+     *  激活流程
+     * @param processInstanceId
+     */
+    public void activateProcessInstance(String processInstanceId){
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (null == processInstance) {
+            throw new FormValidException("不存在正在执行的流程实例:[ " + processInstanceId + " ]");
+        }
+        runtimeService.activateProcessInstanceById(processInstanceId);
+    }
+
+    /**
+     *  流程挂起
+     * @param processInstanceId
+     */
+    public void suspendProcessInstance(String processInstanceId) {
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (null == processInstance) {
+            throw new FormValidException("不存在正在执行的流程实例:[ " + processInstanceId + " ]");
+        }
+        runtimeService.suspendProcessInstanceById(processInstanceId);
+    }
 
     /**
      * 流程定义详情配置页
@@ -148,46 +173,6 @@ public class ProcessService {
         List<UserProcessInstance> userProcessInstances = userProcessInstanceMapper.findByPage(page, form);
         page.setRecords(userProcessInstances);
 
-        // 用户ID 集合
-        Set<String> allUserIdSet = new HashSet<>();
-
-        userProcessInstances.forEach(obj -> {
-            Set<String> idSet = new HashSet<>();
-            obj.setAssigneeUserIds(idSet);
-
-            if (StringUtils.isNotBlank(obj.getAssignee())) {
-                idSet.add(obj.getAssignee());
-            } else {
-                String[] candidateUser = obj.getCandidateUser().split(WorkFlowConfiguration.CANDIDATE_SEPARATOR);
-                for (String user : candidateUser) {
-                    if (StringUtils.isNotBlank(user)) {
-                        idSet.add(user);
-                    }
-                }
-            }
-
-            allUserIdSet.add(obj.getCreatorId());
-            allUserIdSet.addAll(idSet);
-        });
-
-        // 用户名映射
-        Map<String, String> usernameMap = userEntityService.getUsernameMapByUserIds(allUserIdSet);
-
-        userProcessInstances.forEach(obj -> {
-            Set<String> userIdSet = obj.getAssigneeUserIds();
-
-            Set<String> usernameSet = new HashSet<>(userIdSet.size());
-            userIdSet.forEach(userId -> {
-                String username = usernameMap.get(userId);
-                if (StringUtils.isNotBlank(username)) {
-                    usernameSet.add(username);
-                }
-            });
-
-            obj.setCreatorName(usernameMap.get(obj.getCreatorId()));
-            obj.setAssigneeNameSet(usernameSet);
-        });
-
         return page;
     }
 
@@ -202,6 +187,23 @@ public class ProcessService {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
         InputStream inputStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getDiagramResourceName());
         return inputStream;
+    }
+
+    /**
+     * 开启流程 + 启动第一步
+     *
+     * @param processKey
+     * @param id
+     * @param userId
+     * @return
+     */
+    public ProcessInstance openProcessInstanceWithFirstCommit(String processKey, Long id, String userId) {
+
+        ProcessInstance processInstance = openProcessInstance(processKey, id, userId);
+        // 完成任务
+        userTaskService.completeTaskByProcessInstance(processInstance, null, processKey + "." + id);
+
+        return processInstance;
     }
 
     /**
@@ -221,9 +223,6 @@ public class ProcessService {
         identityService.setAuthenticatedUserId(userId);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processKey, params);
         runtimeService.updateBusinessKey(processInstance.getId(), processKey + "." + id);
-
-        // 完成任务
-        userTaskService.completeTaskByProcessInstance(processInstance, null, processKey + "." + id);
 
         return processInstance;
     }

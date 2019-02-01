@@ -6,68 +6,72 @@
 <mapper namespace="com.oldguy.example.modules.workflow.dao.jpas.UserProcessInstanceMapper">
 
     <select id="findOne" parameterType="string" resultType="UserProcessInstance">
+    SELECT
+        d.ID_ processInstanceId,
+        d.BUSINESS_KEY_ businessKey,
+        d.START_USER_ID_ creatorId,
+        d.START_TIME_ startTime,
+        d.END_TIME_ endTime,
+        f.NAME_ processDefinitionName,
+        f.KEY_ processDefinitionKey,
+        e.NAME_ taskName,
+        e.ASSIGNEE_ assignees,
+        g.SUSPENSION_STATE_ active
+    FROM
+        act_hi_procinst d
+    LEFT JOIN act_re_procdef f ON d.PROC_DEF_ID_ = f.ID_
+    LEFT JOIN act_ru_execution g ON d.BUSINESS_KEY_ = g.BUSINESS_KEY_
+    LEFT JOIN(
         SELECT
-        a.ID_ id
-        ,a.BUSINESS_KEY_ businessKey
-        ,a.START_USER_ID_ creatorId
-        ,a.START_TIME_ startTime
-        ,a.END_TIME_ endTime
-        ,b.NAME_ taskName
-        ,b.ASSIGNEE_ assignee
-        ,d.creator_id
-        ,d.creator_name
-        ,g.NAME_ processName
-        ,f.candidate_user
-        ,g.KEY_ processDefinitionKey
+            a.NAME_,a.PROC_INST_ID_,
+            IFNULL(a.ASSIGNEE_,GROUP_CONCAT(b.USER_ID_)) ASSIGNEE_
         FROM
-        ACT_HI_PROCINST a
-        LEFT JOIN ACT_HI_TASKINST b ON a.PROC_INST_ID_ = b.PROC_INST_ID_
-        LEFT JOIN history_task d ON d.business_key = a.BUSINESS_KEY_
-        LEFT JOIN (
-        SELECT e.TASK_ID_,GROUP_CONCAT(e.USER_ID_) candidate_user FROM ACT_HI_IDENTITYLINK e WHERE e.TYPE_ = 'candidate' GROUP BY e.TASK_ID_
-        ) f ON f.TASK_ID_ = b.ID_
-        LEFT JOIN ACT_RE_PROCDEF g ON a.PROC_DEF_ID_ = g.ID_
-        WHERE
-        b.START_TIME_ = (SELECT MAX(c.START_TIME_) FROM ACT_HI_TASKINST c  WHERE b.PROC_INST_ID_ = c.PROC_INST_ID_)
-        AND a.ID_ = #{processInstanceId}
+            act_hi_taskinst a
+        LEFT JOIN act_hi_identitylink b ON a.ID_ = b.TASK_ID_
+        INNER JOIN (
+        SELECT MAX(START_TIME_) START_TIME_ ,PROC_INST_ID_ FROM act_hi_taskinst WHERE ISNULL(END_TIME_) GROUP BY PROC_INST_ID_
+        ) c ON a.START_TIME_ = c.START_TIME_ AND a.PROC_INST_ID_ = c.PROC_INST_ID_
+        GROUP BY a.PROC_INST_ID_
+    ) e ON d.ID_ = e.PROC_INST_ID_
+    WHERE
+        d.START_USER_ID_ = #{id};
     </select>
 
 
-    <select id="findByPage" parameterType="long" resultType="UserProcessInstance">
+    <select id="findByPage" resultType="UserProcessInstance">
         SELECT
-        a.ID_ id
-        ,a.BUSINESS_KEY_ businessKey
-        ,a.START_USER_ID_ creatorId
-        ,a.START_TIME_ startTime
-        ,a.END_TIME_ endTime
-        ,b.NAME_ taskName
-        ,b.ASSIGNEE_ assignee
-        ,d.creator_id
-        ,d.creator_name
-        ,g.NAME_ processName
-        ,f.candidate_user
-        ,g.KEY_ processDefinitionKey
+        d.ID_ processInstanceId,
+        d.BUSINESS_KEY_ businessKey,
+        d.START_USER_ID_ creatorId,
+        d.START_TIME_ startTime,
+        d.END_TIME_ endTime,
+        f.NAME_ processDefinitionName,
+        f.KEY_ processDefinitionKey,
+        e.NAME_ taskName,
+        e.ASSIGNEE_ assignees,
+        g.SUSPENSION_STATE_ active
         FROM
-        ACT_HI_PROCINST a
-        LEFT JOIN ACT_HI_TASKINST b ON a.PROC_INST_ID_ = b.PROC_INST_ID_
-        LEFT JOIN history_task d ON d.business_key = a.BUSINESS_KEY_
-        LEFT JOIN (
-        SELECT e.TASK_ID_,GROUP_CONCAT(e.USER_ID_) candidate_user FROM ACT_HI_IDENTITYLINK e WHERE e.TYPE_ = 'candidate' GROUP BY e.TASK_ID_
-        ) f ON f.TASK_ID_ = b.ID_
-        LEFT JOIN ACT_RE_PROCDEF g ON a.PROC_DEF_ID_ = g.ID_
-        WHERE
-        b.START_TIME_ = (SELECT MAX(c.START_TIME_) FROM ACT_HI_TASKINST c  WHERE b.PROC_INST_ID_ = c.PROC_INST_ID_)
-        <if test="form.userId != null and !&quot;&quot;.equals(form.userId.toString().trim())">
-          AND a.START_USER_ID_ = #{form.userId}
-        </if>
-        <if test="form.queryText != null and !&quot;&quot;.equals(form.queryText.toString().trim())">
-            AND (
-            g.NAME_ LIKE CONCAT('%',#{form.queryText},'%')
-            OR d.confirm_username LIKE CONCAT('%',#{form.queryText},'%')
-            OR b.NAME_ LIKE CONCAT('%',#{form.queryText},'%')
-            )
-        </if>
-        ORDER BY a.START_TIME_ DESC
+        act_hi_procinst d
+        LEFT JOIN act_re_procdef f ON d.PROC_DEF_ID_ = f.ID_
+        LEFT JOIN act_ru_execution g ON d.BUSINESS_KEY_ = g.BUSINESS_KEY_
+        LEFT JOIN(
+        SELECT
+        a.NAME_,a.PROC_INST_ID_,
+        IFNULL(a.ASSIGNEE_,GROUP_CONCAT(b.USER_ID_)) ASSIGNEE_
+        FROM
+        act_hi_taskinst a
+        LEFT JOIN act_hi_identitylink b ON a.ID_ = b.TASK_ID_
+        INNER JOIN (
+        SELECT MAX(START_TIME_) START_TIME_ ,PROC_INST_ID_ FROM act_hi_taskinst WHERE ISNULL(END_TIME_) GROUP BY PROC_INST_ID_
+        ) c ON a.START_TIME_ = c.START_TIME_ AND a.PROC_INST_ID_ = c.PROC_INST_ID_
+        GROUP BY a.PROC_INST_ID_
+        ) e ON d.ID_ = e.PROC_INST_ID_
+        <where>
+            <if test="form.userId != null and !&quot;&quot;.equals(form.userId.toString().trim())">
+                AND d.START_USER_ID_ = #{form.userId}
+            </if>
+        </where>
+        ORDER BY d.START_TIME_ DESC
     </select>
 
 </mapper>
