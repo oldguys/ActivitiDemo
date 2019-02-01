@@ -1,9 +1,10 @@
 ## Activiti 自定义 ProcessDefinition 业务配置表
 
+
 > 流程审批基本都是通用的，但是业务审批却是多态的，一模一样流程图的两个不同流程，调用的方法截然不同，而获取资源的写法基本一致，为了降低代码耦合度，可以定制通过的审批信息获取表，来获取数据。
 >
 > 基于Activiti 6.0
-> GitHub  [https://github.com/oldguys/MultipleDataSourceDemo](https://github.com/oldguys/MultipleDataSourceDemo)
+> GitHub  [https://github.com/oldguys/ActivitiDemo](https://github.com/oldguys/ActivitiDemo)
 >
 
 #####设计思路:
@@ -12,10 +13,10 @@
 3. 连线配置同理
 
 功能界面图:
-![节点状态.png](https://raw.githubusercontent.com/oldguys/ActivitiDemo/master/image/节点状态.png)
+![节点状态.png](https://upload-images.jianshu.io/upload_images/14387783-5b85f11fd3952f98.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
-![连线配置.png](https://raw.githubusercontent.com/oldguys/ActivitiDemo/master/image/连线配置.png)
+![连线配置.png](https://upload-images.jianshu.io/upload_images/14387783-e3e65528f5396c59.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ##### 1.审批状态实体
 ```
@@ -250,3 +251,41 @@ com.oldguy.example.modules.workflow.service.UserTaskService 获取流程审核�
 
 ```
 
+获取当前流程状态
+```
+    /**
+     * 获取流程审核状态
+     *
+     * @param processInstanceId
+     * @return
+     */
+    public int updateAuditStatus(String processInstanceId) {
+
+        String auditCode = "";
+
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (null != historicProcessInstance) {
+
+            // 流程已完成
+            if (null != historicProcessInstance.getEndTime()) {
+                ProcessAuditStatus processAuditStatus = processAuditStatusMapper.findByProcessDefinitionIdAndUserTask(historicProcessInstance.getProcessDefinitionId(), WorkFlowConfiguration.PROCESS_END_EVENT_FLAG);
+                if (null != processAuditStatus) {
+                    auditCode = processAuditStatus.getAuditCode();
+                }
+            } else {
+                // 流程未完成
+                List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).orderByTaskCreateTime().desc().list();
+                if (!taskList.isEmpty()) {
+                    HistoricTaskInstance historicTaskInstance = taskList.get(0);
+                    ProcessAuditStatus processAuditStatus = processAuditStatusMapper.findByProcessDefinitionIdAndUserTask(historicTaskInstance.getProcessDefinitionId(), historicTaskInstance.getTaskDefinitionKey());
+                    if (null != processAuditStatus) {
+                        auditCode = processAuditStatus.getAuditCode();
+                    }
+                }
+            }
+        }
+
+        // 更新业务
+        return commonWorkEntityService.updateAuditStatus(historicProcessInstance.getBusinessKey(), auditCode);
+    }
+```
