@@ -34,7 +34,7 @@
       <bpmndi:BPMNShape bpmnElement="_2" id="Yaoqiang-_2">
         <dc:Bounds height="32.0" width="32.0" x="70.0" y="50.0"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds height="19.84" width="56.0" x="58.0" y="90.02"/>
+          <dc:Bounds height="19.84" width="56.0" x="58.0" y="89.96"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="step1" id="Yaoqiang-step1">
@@ -52,7 +52,7 @@
       <bpmndi:BPMNShape bpmnElement="endevent" id="Yaoqiang-endevent">
         <dc:Bounds height="32.0" width="32.0" x="70.0" y="360.0"/>
         <bpmndi:BPMNLabel>
-          <dc:Bounds height="19.84" width="51.0" x="60.5" y="400.02"/>
+          <dc:Bounds height="19.84" width="51.0" x="60.5" y="399.96"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="_8" id="Yaoqiang-_8">

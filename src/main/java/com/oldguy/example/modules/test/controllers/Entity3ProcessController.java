@@ -57,9 +57,9 @@ public class Entity3ProcessController {
     public Object openProcessInstance() {
 
         List<String> assigneeList = new ArrayList<>();
-        assigneeList.add("123456");
-        assigneeList.add("123");
-        assigneeList.add("测试2");
+        assigneeList.add("1");
+        assigneeList.add("2");
+        assigneeList.add("3");
 
         String processInstanceId = entity3ProcessService.openProcessInstance(assigneeList);
         // 更新审核状态
