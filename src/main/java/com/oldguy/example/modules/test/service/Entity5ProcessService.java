@@ -148,9 +148,6 @@ public class Entity5ProcessService extends BaseService {
             System.out.println("不是任务节点.................");
         }
 
-        System.out.println("------------------------------");
-
-
     }
 
 

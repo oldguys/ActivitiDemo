@@ -1,13 +1,13 @@
-## Activiti 自定义 ProcessDefinition 业务配置表
+##Activiti 6.0 动态扭转流程节点(节点A -> 节点N(B,C,D))
+
 > **业务场景**： 在流程开发中，经常出现那种特殊情况，如流程需要强行转到另外的节点（一个/多个）。这个时候，可以通过修改 Bpmn Model 的 SequenceFlow 来进行修改
 > **环境**：springboot + activiti6.0
->  GitHub  [https://github.com/oldguys/ActivitiDemo](https://github.com/oldguys/ActivitiDemo)
 >
 
 业务描述： 当任务执行到 测试节点A 可以 动态指定到 任意节点（B，C，D，E）（一个任务或多个任务）。
 ![流程图](https://upload-images.jianshu.io/upload_images/14387783-3657a7f0fd176563.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-**实现思路**：
+实现思路：
 1. 通过流程缓存的 Bpmn Model ，获取到 **当前任务节点** 和 **需要调整任务节点**。
 2. 根据 节点 创建流程连线集合 List<SequenceFlow>  (如：节点A -> 节点N（B，C，D，E）)。并替换原本的OutgoingFlows
 3. 完成任务，注意：在定义流程阶段，得把流程标识清楚，如：
@@ -22,7 +22,7 @@
 业务问题：当生成多个任务的时候，注意完成任务需要特殊完成，否则流程会出现多重审批。
  
 
-**方法**：
+方法：
 ```
 
     @Transactional(rollbackFor = RuntimeException.class)
@@ -101,7 +101,7 @@
 
 ```
 
-**测试例子**：
+测试例子：
 
 1. 希望流程转派到4个节点，同时生成4个任务。
 

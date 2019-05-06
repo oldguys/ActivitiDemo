@@ -40,7 +40,7 @@ public class Entity4ProcessTest {
      */
     @Test
     public void testCompleteTask() {
-        entity4ProcessService.changeNode("60005");
+        entity4ProcessService.changeNode("102505");
     }
 
     /**
