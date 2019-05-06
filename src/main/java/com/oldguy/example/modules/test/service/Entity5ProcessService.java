@@ -124,6 +124,9 @@ public class Entity5ProcessService extends BaseService {
          */
         if (currentElement instanceof UserTask) {
 
+            /**
+             *  当前流程节点
+             */
             UserTask current = (UserTask) currentElement;
             // 缓存原本的流向
             List<SequenceFlow> sourceFlows = current.getOutgoingFlows();

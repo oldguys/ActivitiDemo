@@ -7,14 +7,14 @@
     <userTask id="sid-63AA4611-728B-4C3E-B0A7-A1385DE9BBC3" name="测试节点A" activiti:assignee="${assignee}"></userTask>
     <userTask id="test-b" name="测试节点B" activiti:assignee="${assignee}"></userTask>
     <userTask id="test-c" name="测试节点C" activiti:assignee="${assignee}"></userTask>
-    <userTask id="sid-64A76C9F-7293-4C03-A040-6B2DA6E08CFC" name="测试节点D" activiti:assignee="${assignee}"></userTask>
-    <userTask id="sid-20750E47-878C-4435-9A8B-E8BC8962C292" name="测试节点E" activiti:assignee="${assignee}"></userTask>
+    <userTask id="test-d" name="测试节点D" activiti:assignee="${assignee}"></userTask>
+    <userTask id="test-e" name="测试节点E" activiti:assignee="${assignee}"></userTask>
     <sequenceFlow id="sid-7C20546A-22B2-4200-BD17-F1A5727D6906" sourceRef="startEvent1" targetRef="sid-63AA4611-728B-4C3E-B0A7-A1385DE9BBC3"></sequenceFlow>
     <sequenceFlow id="sid-F3CA21C8-796D-4776-9F31-4B3034CABAE7" sourceRef="sid-63AA4611-728B-4C3E-B0A7-A1385DE9BBC3" targetRef="test-b"></sequenceFlow>
-    <sequenceFlow id="sid-39C601D0-9011-4D12-8FFC-3A10EAFCF505" sourceRef="test-b" targetRef="sid-64A76C9F-7293-4C03-A040-6B2DA6E08CFC"></sequenceFlow>
-    <sequenceFlow id="sid-E02B58D1-6CE5-4ADE-A1DA-3FF78320E587" sourceRef="sid-64A76C9F-7293-4C03-A040-6B2DA6E08CFC" targetRef="sid-20750E47-878C-4435-9A8B-E8BC8962C292"></sequenceFlow>
+    <sequenceFlow id="sid-39C601D0-9011-4D12-8FFC-3A10EAFCF505" sourceRef="test-b" targetRef="test-d"></sequenceFlow>
+    <sequenceFlow id="sid-E02B58D1-6CE5-4ADE-A1DA-3FF78320E587" sourceRef="test-d" targetRef="test-e"></sequenceFlow>
     <endEvent id="sid-D671D944-CEA4-4B0A-ACBB-AF0AD1D1EB59"></endEvent>
-    <sequenceFlow id="sid-814DB89A-B3DE-4F7D-B544-B93574A3A13B" sourceRef="sid-20750E47-878C-4435-9A8B-E8BC8962C292" targetRef="sid-D671D944-CEA4-4B0A-ACBB-AF0AD1D1EB59"></sequenceFlow>
+    <sequenceFlow id="sid-814DB89A-B3DE-4F7D-B544-B93574A3A13B" sourceRef="test-e" targetRef="sid-D671D944-CEA4-4B0A-ACBB-AF0AD1D1EB59"></sequenceFlow>
     <sequenceFlow id="sid-3BB938E8-EE6B-4A1E-9CD7-916580E4741A" sourceRef="test-b" targetRef="test-c"></sequenceFlow>
     <sequenceFlow id="sid-E9AF4B32-373D-4FC1-BDC1-8A1755F88FBE" sourceRef="test-c" targetRef="test-b"></sequenceFlow>
   </process>
@@ -32,10 +32,10 @@
       <bpmndi:BPMNShape bpmnElement="test-c" id="BPMNShape_sid-FED57B1B-D553-4100-9AB4-80B548506057">
         <omgdc:Bounds height="80.0" width="100.0" x="300.0" y="240.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-64A76C9F-7293-4C03-A040-6B2DA6E08CFC" id="BPMNShape_sid-64A76C9F-7293-4C03-A040-6B2DA6E08CFC">
+      <bpmndi:BPMNShape bpmnElement="test-d" id="BPMNShape_sid-64A76C9F-7293-4C03-A040-6B2DA6E08CFC">
         <omgdc:Bounds height="80.0" width="100.0" x="480.0" y="65.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="sid-20750E47-878C-4435-9A8B-E8BC8962C292" id="BPMNShape_sid-20750E47-878C-4435-9A8B-E8BC8962C292">
+      <bpmndi:BPMNShape bpmnElement="test-e" id="BPMNShape_sid-20750E47-878C-4435-9A8B-E8BC8962C292">
         <omgdc:Bounds height="80.0" width="100.0" x="630.0" y="65.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-D671D944-CEA4-4B0A-ACBB-AF0AD1D1EB59" id="BPMNShape_sid-D671D944-CEA4-4B0A-ACBB-AF0AD1D1EB59">
