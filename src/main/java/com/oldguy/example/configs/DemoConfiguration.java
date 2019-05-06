@@ -18,7 +18,7 @@ import javax.sql.DataSource;
 @Configuration
 @MapperScan(basePackages={
         "com.oldguy.example.modules.sys.dao.jpas",
-        "com.oldguy.example.modules.changeNode.dao.jpas",
+        "com.oldguy.example.modules.test.dao.jpas",
         "com.oldguy.example.modules.workflow.dao.jpas"
 })
 public class DemoConfiguration {
