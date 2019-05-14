@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -39,8 +40,9 @@ public class Entity3ProcessTest {
      * 测试完成 节点1 任务到节点2 ，进行 普通任务向 会签任务进行转换
      */
     @Test
+//    @Transactional(rollbackFor = Exception.class)
     public void testCompleteTask() {
-        String taskId = "47506";
+        String taskId = "2506";
 
 
         List<String> assigneeList = new ArrayList<>();
@@ -51,7 +53,7 @@ public class Entity3ProcessTest {
         map.put("assigneeList", assigneeList);
 
         taskService.complete(taskId, map);
-
+//        throw new RuntimeException("测试。。。。。。。。。。。");
     }
 
     /**

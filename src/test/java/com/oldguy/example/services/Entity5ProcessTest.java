@@ -7,8 +7,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,19 +30,32 @@ public class Entity5ProcessTest {
     private TaskService taskService;
 
     @Test
-    public void testOpenInstance(){
+    public void test1() {
+
+        List<String> assigneeList = new ArrayList<>();
+        assigneeList.add("2");
+        assigneeList.add("4");
+        assigneeList.add("6");
+
+        entity5ProcessService.test1("17520", assigneeList);
+    }
+
+    @Test
+    public void testOpenInstance() {
         entity5ProcessService.openProcessInstance();
     }
 
     @Test
-    public void testDefaultComplete(){
+    @Transactional(rollbackFor = Exception.class)
+    public void testDefaultComplete() {
         Map<String, Object> data = new HashMap<>(1);
         data.put("assignee", "3");
-        taskService.complete("77506",data);
+        taskService.complete("112506", data);
+//        throw new RuntimeException("transpondTask。。。。。。。。。。。");
     }
 
     @Test
-    public void test(){
-        entity5ProcessService.test("97522","test-b","test-c","test-d","test-e");
+    public void testTranspondTask() {
+        entity5ProcessService.transpondTask("97522", "transpondTask-b", "transpondTask-c", "transpondTask-d", "transpondTask-e");
     }
 }

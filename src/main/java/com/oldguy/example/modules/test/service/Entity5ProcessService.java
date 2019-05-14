@@ -1,15 +1,12 @@
 package com.oldguy.example.modules.test.service;
 
 import com.oldguy.example.modules.common.services.BaseService;
-import com.oldguy.example.modules.sys.services.UserEntityService;
-import com.oldguy.example.modules.test.dao.entities.Entity4Process;
 import com.oldguy.example.modules.test.dao.entities.Entity5Process;
-import com.oldguy.example.modules.test.dao.jpas.Entity3ProcessMapper;
 import com.oldguy.example.modules.test.dao.jpas.Entity5ProcessMapper;
-import com.oldguy.example.modules.workflow.service.ProcessService;
-import com.oldguy.example.modules.workflow.service.UserTaskService;
+import com.oldguy.example.modules.workflow.commands.AddMultiInstanceExecutionCmd;
 import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
+import org.activiti.engine.ManagementService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -39,6 +36,17 @@ public class Entity5ProcessService extends BaseService {
     private TaskService taskService;
     @Autowired
     private RepositoryService repositoryService;
+    @Autowired
+    private ManagementService managementService;
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public void test1(String taskId, List<String> assigneeList) {
+
+        managementService.executeCommand(new AddMultiInstanceExecutionCmd(taskId, assigneeList));
+
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     public String openProcessInstance() {
@@ -61,20 +69,20 @@ public class Entity5ProcessService extends BaseService {
     }
 
     /**
-     *  动态流转节点 （1 ： N）
-     *  非直线流程（任务开始时间） A > B = C > D ，在A任务完成时，同时开启 B ，C 任务。
-     *
-     *  解决思路 ： 改动当前任务的流转线（新增），将流程节点流向改为多个节点。这样就可以
-     *  动态扭转流程走向。
-     *
-     *  注意：
-     *      1. 改变 Bpmn Model.process 之后，再 完成任务。
-     *      2. 一开始设置 .bpmn 文件的时候 在注入审批人 标志必须 可区分 如: assignee = ${assignee_b};assignee = ${assignee_c}
-     *      以防止 出现审批人 出错。
-     *      3. 最好在 完成任务之后，将流程流向更改回默认。（虽然已经确认 process 基于ThreadLocal ，但是防止意外）
+     * 动态流转节点 （1 ： N）
+     * 非直线流程（任务开始时间） A > B = C > D ，在A任务完成时，同时开启 B ，C 任务。
+     * <p>
+     * 解决思路 ： 改动当前任务的流转线（新增），将流程节点流向改为多个节点。这样就可以
+     * 动态扭转流程走向。
+     * <p>
+     * 注意：
+     * 1. 改变 Bpmn Model.process 之后，再 完成任务。
+     * 2. 一开始设置 .bpmn 文件的时候 在注入审批人 标志必须 可区分 如: assignee = ${assignee_b};assignee = ${assignee_c}
+     * 以防止 出现审批人 出错。
+     * 3. 最好在 完成任务之后，将流程流向更改回默认。（虽然已经确认 process 基于ThreadLocal ，但是防止意外）
      */
     @Transactional(rollbackFor = RuntimeException.class)
-    public void test(String taskId, String... useTasks) {
+    public void transpondTask(String taskId, String... useTasks) {
 
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 

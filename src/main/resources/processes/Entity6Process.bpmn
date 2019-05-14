@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="Entity6Process" name="测试流程6" isExecutable="true">
+    <documentation>测试会签加签（并行，串行）。节点加签，前置加签，后置加签</documentation>
+    <startEvent id="startEvent1"></startEvent>
+    <userTask id="parallel-task" name="并行会签" activiti:assignee="${assignee}">
+      <extensionElements>
+        <modeler:initiator-can-complete xmlns:modeler="http://activiti.com/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="${assigneeList}" activiti:elementVariable="assignee"></multiInstanceLoopCharacteristics>
+    </userTask>
+    <userTask id="sequence-task" name="串行会签" activiti:assignee="${assignee}">
+      <extensionElements>
+        <modeler:initiator-can-complete xmlns:modeler="http://activiti.com/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="true" activiti:collection="${assigneeList}" activiti:elementVariable="assignee"></multiInstanceLoopCharacteristics>
+    </userTask>
+    <userTask id="sid-90A6BD88-3D15-4C3B-A7EB-397371B1A234" name="节点A" activiti:assignee="${assignee}">
+      <extensionElements>
+        <modeler:initiator-can-complete xmlns:modeler="http://activiti.com/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="${assigneeList}" activiti:elementVariable="assignee"></multiInstanceLoopCharacteristics>
+    </userTask>
+    <userTask id="sid-B96A8A5C-00BD-4460-822E-4D6932BD88D7" name="节点B" activiti:assignee="${assignee}">
+      <extensionElements>
+        <modeler:initiator-can-complete xmlns:modeler="http://activiti.com/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
+      </extensionElements>
+    </userTask>
+    <endEvent id="sid-FD1CE37F-1772-4A43-B210-0560EF2B65A3"></endEvent>
+    <sequenceFlow id="sid-8DD65116-9CC7-4CD2-A54A-549BDDD9804E" sourceRef="startEvent1" targetRef="parallel-task"></sequenceFlow>
+    <sequenceFlow id="sid-AD693B91-83D0-4060-B630-C7AC3F091A01" sourceRef="sequence-task" targetRef="sid-90A6BD88-3D15-4C3B-A7EB-397371B1A234"></sequenceFlow>
+    <sequenceFlow id="sid-A8CEEAF7-88C5-4AFC-82AD-3BA838EA4FC7" sourceRef="sid-90A6BD88-3D15-4C3B-A7EB-397371B1A234" targetRef="sid-B96A8A5C-00BD-4460-822E-4D6932BD88D7"></sequenceFlow>
+    <sequenceFlow id="sid-B8A95F10-3182-4FAD-9258-6D6460DF8E47" sourceRef="sid-B96A8A5C-00BD-4460-822E-4D6932BD88D7" targetRef="sid-FD1CE37F-1772-4A43-B210-0560EF2B65A3"></sequenceFlow>
+    <userTask id="sid-F1FEB26A-00B9-4E2B-9035-B4A345498E44" name="测试中转" activiti:assignee="${assignee}">
+      <extensionElements>
+        <modeler:initiator-can-complete xmlns:modeler="http://activiti.com/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sid-3B5CCEB9-156E-4ED8-8A4B-7877168A4F32" sourceRef="parallel-task" targetRef="sid-F1FEB26A-00B9-4E2B-9035-B4A345498E44"></sequenceFlow>
+    <sequenceFlow id="sid-9E8570A3-E97E-437D-8F56-2C4EDDACF0A3" sourceRef="sid-F1FEB26A-00B9-4E2B-9035-B4A345498E44" targetRef="sequence-task"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Entity6Process">
+    <bpmndi:BPMNPlane bpmnElement="Entity6Process" id="BPMNPlane_Entity6Process">
+      <bpmndi:BPMNShape bpmnElement="startEvent1" id="BPMNShape_startEvent1">
+        <omgdc:Bounds height="30.0" width="30.0" x="15.0" y="175.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallel-task" id="BPMNShape_parallel-task">
+        <omgdc:Bounds height="80.0" width="100.0" x="120.0" y="150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sequence-task" id="BPMNShape_sequence-task">
+        <omgdc:Bounds height="80.0" width="100.0" x="420.0" y="150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-90A6BD88-3D15-4C3B-A7EB-397371B1A234" id="BPMNShape_sid-90A6BD88-3D15-4C3B-A7EB-397371B1A234">
+        <omgdc:Bounds height="80.0" width="100.0" x="605.0" y="150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-B96A8A5C-00BD-4460-822E-4D6932BD88D7" id="BPMNShape_sid-B96A8A5C-00BD-4460-822E-4D6932BD88D7">
+        <omgdc:Bounds height="80.0" width="100.0" x="755.0" y="150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-FD1CE37F-1772-4A43-B210-0560EF2B65A3" id="BPMNShape_sid-FD1CE37F-1772-4A43-B210-0560EF2B65A3">
+        <omgdc:Bounds height="28.0" width="28.0" x="920.0" y="176.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-F1FEB26A-00B9-4E2B-9035-B4A345498E44" id="BPMNShape_sid-F1FEB26A-00B9-4E2B-9035-B4A345498E44">
+        <omgdc:Bounds height="80.0" width="100.0" x="270.0" y="150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-AD693B91-83D0-4060-B630-C7AC3F091A01" id="BPMNEdge_sid-AD693B91-83D0-4060-B630-C7AC3F091A01">
+        <omgdi:waypoint x="520.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="605.0" y="190.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-3B5CCEB9-156E-4ED8-8A4B-7877168A4F32" id="BPMNEdge_sid-3B5CCEB9-156E-4ED8-8A4B-7877168A4F32">
+        <omgdi:waypoint x="220.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="190.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-8DD65116-9CC7-4CD2-A54A-549BDDD9804E" id="BPMNEdge_sid-8DD65116-9CC7-4CD2-A54A-549BDDD9804E">
+        <omgdi:waypoint x="45.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="120.0" y="190.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-A8CEEAF7-88C5-4AFC-82AD-3BA838EA4FC7" id="BPMNEdge_sid-A8CEEAF7-88C5-4AFC-82AD-3BA838EA4FC7">
+        <omgdi:waypoint x="705.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="755.0" y="190.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-9E8570A3-E97E-437D-8F56-2C4EDDACF0A3" id="BPMNEdge_sid-9E8570A3-E97E-437D-8F56-2C4EDDACF0A3">
+        <omgdi:waypoint x="370.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="190.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-B8A95F10-3182-4FAD-9258-6D6460DF8E47" id="BPMNEdge_sid-B8A95F10-3182-4FAD-9258-6D6460DF8E47">
+        <omgdi:waypoint x="855.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="920.0" y="190.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

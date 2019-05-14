@@ -25,3 +25,7 @@ mybatis:
 workflow-configuration-location: "configs/workflow-url.properties"
 server:
   port: 8081
+
+logging:
+  level:
+    root: info
