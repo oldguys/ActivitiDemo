@@ -12,3 +12,4 @@
 5. Activiti 获取流程图
 6. 动态改变流程节点类型（普通节点 ——> 会签节点）Entity4Process
 7. 动态调转流程节点，让流程跑到指定的节点（节点A -> 节点N（可以从一个节点任务变成多个节点任务））Entity5Process
+8. 会签加签，减签 Entity6Process
