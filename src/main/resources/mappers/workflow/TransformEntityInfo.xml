@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.oldguy.example.modules.workflow.dao.jpas.TransformEntityInfoMapper">
+
+    <sql id="table_name">transform_entity_info</sql>
+
+    <sql id="all_entity_columns">
+        ${prefix}.process_instance_id,
+        ${prefix}.task_define_key,
+        ${prefix}.sequential,
+        ${prefix}.create_time,
+        ${prefix}.id,
+        ${prefix}.`status`
+	</sql>
+
+
+
+    <select id="findByProcessInstance" parameterType="string" resultType="TransformEntityInfo">
+        SELECT
+        <include refid="all_entity_columns">
+            <property name="prefix" value="a"/>
+        </include>
+        FROM
+        <include refid="table_name"/>
+        a
+        WHERE
+        process_instance_id = #{processInstanceId}
+    </select>
+
+    <insert id="save" parameterType="TransformEntityInfo" keyProperty="id" useGeneratedKeys="true">
+        INSERT
+        <include refid="table_name"/>
+        (
+        process_instance_id,
+        task_define_key,
+        sequential,
+        create_time,
+        `status`
+        )
+        VALUES (
+        #{processInstanceId},
+        #{taskDefineKey},
+        #{sequential},
+        #{createTime},
+        #{status}
+        )
+    </insert>
+
+</mapper>

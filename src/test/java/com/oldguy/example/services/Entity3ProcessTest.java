@@ -1,10 +1,7 @@
 package com.oldguy.example.services;
 
 import com.oldguy.example.modules.test.dao.entities.Entity3Process;
-import com.oldguy.example.modules.test.dao.entities.Entity4Process;
 import com.oldguy.example.modules.test.dao.jpas.Entity3ProcessMapper;
-import com.oldguy.example.modules.test.dao.jpas.Entity4ProcessMapper;
-import com.oldguy.example.modules.test.service.Entity4ProcessService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -13,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -34,6 +30,8 @@ public class Entity3ProcessTest {
     private Entity3ProcessMapper entity3ProcessMapper;
     @Autowired
     private TaskService taskService;
+
+
 
 
     /**
